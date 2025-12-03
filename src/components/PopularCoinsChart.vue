@@ -10,8 +10,8 @@ const coinsStore = useCoinsStore();
 
 const topCoins = computed(() => {
   return [...coinsStore.coinDataTop50]
-    .sort((a, b) => parseFloat(b.volumeUsd24Hr) - parseFloat(a.volumeUsd24Hr))
-    .slice(0, 4);
+      .sort((a, b) => parseFloat(b.volumeUsd24Hr) - parseFloat(a.volumeUsd24Hr))
+      .slice(0, 4);
 });
 
 const coinColors2 = ref({});
@@ -96,35 +96,49 @@ onMounted(() => {
 });
 
 function formatPrice(price) {
-  if (price >= 1.01) return price.toFixed(2)
+  if (price >= 1.01) return price.toFixed(2);
 
-  const [_, decimals] = price.toString().split(".")
-  if (!decimals) return price.toFixed(2)
+  const [_, decimals] = price.toString().split(".");
+  if (!decimals) return price.toFixed(2);
 
-  const firstNonZeroIndex = decimals.search(/[^0]/)
+  const firstNonZeroIndex = decimals.search(/[^0]/);
 
   if (firstNonZeroIndex >= 4) {
-    return price.toFixed(8)
+    return price.toFixed(8);
   } else if (firstNonZeroIndex >= 2) {
-    return price.toFixed(4)
+    return price.toFixed(4);
   } else {
-    return price.toFixed(2)
+    return price.toFixed(2);
   }
 }
 </script>
 
 <template>
-  <div className="bg-[#1B2028] rounded-[10px] p-[20px] w-[1000px] flex flex-wrap justify-around">
-    <h1 className="font-bold text-white w-full text-center mb-4 text-3xl">
+  <div class="bg-[#1B2028] rounded-[10px] p-[20px] w-[1000px] flex flex-wrap justify-around">
+    <h1 class="font-bold text-white w-full text-center mb-4 text-3xl">
       Today's most popular coins chart
     </h1>
 
-    <div v-for="coin in topCoins" :key="coin.id" className="w-[45%] mb-6">
+    <div class="mb-6 text-center text-white w-full">
+      <label for="interval" class="font-bold mr-2">Select Time Interval:</label>
+      <select
+          id="interval"
+          v-model="selectedCoinData"
+          @change="fetchChartData"
+          class="rounded p-2 bg-[#2A303C] text-white font-semibold border border-gray-600 focus:ring-2 focus:ring-purple-500 focus:outline-none hover:bg-[#343B47] transition duration-200 cursor-pointer"
+      >
+        <option value="1DAY">1 hour</option>
+        <option value="7DAY">1 week</option>
+        <option value="1MTH">1 month</option>
+      </select>
+    </div>
+
+    <div v-for="coin in topCoins" :key="coin.id" class="w-[45%] mb-6">
       <h2 class="text-white font-bold text-center mb-2">{{ coin.symbol }} Price</h2>
       <Line
-        v-if="chartData[coin.id] && chartData[coin.id].labels.length > 0"
-        :data="chartData[coin.id]"
-        :options="chartOptions"
+          v-if="chartData[coin.id] && chartData[coin.id].labels.length > 0"
+          :data="chartData[coin.id]"
+          :options="chartOptions"
       />
       <p v-else class="text-white text-center">
         Error fetching chart data for {{ coin.symbol }}
